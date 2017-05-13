@@ -28,7 +28,7 @@ Bugs can occur!
   - [Compiling the source with Arduino](#compiling-the-source-with-arduino)
   - [Adding OLED display](#adding-oled-display)
 - [How to use it](#how-to-use-it)
-  - [Usage of fake captive portal] (#captive-portal-usage)
+  - [Usage of fake captive portal](#captive-portal-usage)
 - [FAQ](#faq)
 - [License](#license)
 - [Sources and additional links](#sources-and-additional-links)
