@@ -28,6 +28,7 @@ Bugs can occur!
   - [Compiling the source with Arduino](#compiling-the-source-with-arduino)
   - [Adding OLED display](#adding-oled-display)
 - [How to use it](#how-to-use-it)
+  - [Usage of fake captive portal] (#captive-portal-usage)
 - [FAQ](#faq)
 - [License](#license)
 - [Sources and additional links](#sources-and-additional-links)
@@ -226,6 +227,10 @@ Note: While scanning the ESP8266 will shut down its access point, so you may hav
 ![webinterface attack menu](https://raw.githubusercontent.com/spacehuhn/esp8266_deauther/master/screenshots/web_screenshot_3.JPG)
 
 Happy hacking :)
+
+
+## Captive Portal Usage
+For changing the captive portal go to data.h and change value of fakePage.
 
 ## FAQ
 

