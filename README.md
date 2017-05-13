@@ -229,8 +229,10 @@ Note: While scanning the ESP8266 will shut down its access point, so you may hav
 Happy hacking :)
 
 
-## Captive Portal Usage
-For changing the captive portal go to data.h and change value of fakePage.
+### Captive Portal Usage
+You need to change the SSID and channel as same as victims Wi-Fi.
+For load the saved credentials type *any address*/readit
+For changing the captive portal page go to data.h and change value of fakePage.
 
 ## FAQ
 
