@@ -213,7 +213,7 @@ You can use your smartphone if you have a USB OTG cable.
 ![esp8266 deauther with a smartphone](/screenshots/smartphone_esp_2.jpg)
 
 Scan for Wi-Fi networks and connect to `pwned`. The password is `deauther`.  
-Once connected, you can open up your browser and go to `192.168.4.1`.  
+Once connected, you can open up your browser and go to `*any address*/tools`.  
 
 You can now scan for networks...
 ![webinterface AP scanner](/screenshots/web_screenshot_1.JPG)
@@ -230,9 +230,10 @@ Happy hacking :)
 
 
 ### Captive Portal Usage
-You need to change the SSID and channel as same as victims Wi-Fi.
-For load the saved credentials type *any address*/readit
-For changing the captive portal page go to data.h and change value of fakePage.
+You need to change the SSID and channel as same as victims Wi-Fi.</br>
+For load the saved credentials type `*any address*/checklog`</br>
+For clear the saved credentials type `*any address*/clearlog`</br>
+For changing the captive portal page go to [`data.h`](/esp8266_deauther/data.h) (line 15) and change value of fakePage.
 
 ## FAQ
 
